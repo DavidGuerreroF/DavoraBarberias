@@ -1,0 +1,115 @@
+{% extends 'base_panel.html' %}
+
+{% block page_title %}Clientes{% endblock %}
+{% block page_header %}Clientes{% endblock %}
+{% block breadcrumb_extra %} / <span>Directorio</span>{% endblock %}
+
+{% block panel_content %}
+
+<!-- Buscador -->
+<form method="get" class="filter-bar mb-4">
+  <div class="filter-group flex-fill">
+    <label class="filter-label">Buscar cliente</label>
+    <div class="search-input-wrapper">
+      <i class="bi bi-search search-icon"></i>
+      <input type="text" name="q" value="{{ buscar }}" class="form-control form-control-dark"
+             placeholder="Nombre, apellido o WhatsApp...">
+    </div>
+  </div>
+  <div class="filter-group">
+    <label class="filter-label" style="opacity:0;">&nbsp;</label>
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn-panel-primary"><i class="bi bi-search"></i> Buscar</button>
+      {% if buscar %}<a href="{% url 'panel_clientes' %}" class="btn-panel-secondary"><i class="bi bi-x-lg"></i></a>{% endif %}
+    </div>
+  </div>
+</form>
+
+<div class="table-card">
+  <div class="table-card-header">
+    <div class="table-card-title">
+      <i class="bi bi-people me-2" style="color: var(--purple-300);"></i>
+      Clientes
+      <span style="font-family: var(--font-body); font-size:0.85rem; color: var(--gray-600); font-weight:400; margin-left:8px;">
+        {{ clientes.count }} encontrado{{ clientes.count|pluralize:"s" }}
+      </span>
+    </div>
+    <a href="{% url 'panel_cliente_crear' %}" class="btn-panel-primary">
+      <i class="bi bi-person-plus"></i> Nuevo cliente
+    </a>
+  </div>
+
+  {% if clientes %}
+  <div class="table-responsive-mobile">
+    <table class="table-dark-barber w-100">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>WhatsApp</th>
+          <th>Email</th>
+          <th>Registrado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cliente in clientes %}
+        <tr>
+          <td>
+            <div class="d-flex align-items-center gap-3">
+              <div class="avatar-circle">{{ cliente.nombre|first }}</div>
+              <div>
+                <div style="font-weight:600; color:#fff;">{{ cliente.nombre_completo }}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <a href="https://wa.me/{{ cliente.whatsapp }}" target="_blank"
+               style="color: #25d366; text-decoration:none; font-size:0.9rem;">
+              <i class="bi bi-whatsapp me-1"></i>{{ cliente.whatsapp }}
+            </a>
+          </td>
+          <td>
+            {% if cliente.email %}
+            <a href="mailto:{{ cliente.email }}" style="color: var(--purple-300); font-size:0.9rem; text-decoration:none;">
+              {{ cliente.email }}
+            </a>
+            {% else %}
+            <span style="color: var(--gray-600);">—</span>
+            {% endif %}
+          </td>
+          <td style="color: var(--gray-500); font-size:0.85rem;">{{ cliente.creado|date:"d/m/Y" }}</td>
+          <td>
+            <div class="d-flex gap-1">
+              <a href="{% url 'panel_cliente_editar' cliente.pk %}" class="btn-panel-edit">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <form method="post" action="{% url 'panel_cliente_eliminar' cliente.pk %}" class="d-inline"
+                    onsubmit="return confirm('¿Eliminar a {{ cliente.nombre_completo }}?')">
+                {% csrf_token %}
+                <button type="submit" class="btn-panel-danger"><i class="bi bi-trash3"></i></button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon"><i class="bi bi-people"></i></div>
+    <div class="empty-state-title">
+      {% if buscar %}Sin resultados para "{{ buscar }}"{% else %}Sin clientes registrados{% endif %}
+    </div>
+    <p class="empty-state-text">
+      {% if buscar %}
+        <a href="{% url 'panel_clientes' %}" class="text-purple">Limpiar búsqueda</a>
+      {% else %}
+        Los clientes aparecerán aquí cuando realicen reservas.
+      {% endif %}
+    </p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

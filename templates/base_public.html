@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body %}
+<!-- NAVBAR -->
+<nav class="navbar-barber navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'home' %}">
+      <i class="bi bi-scissors" style="color: var(--purple-400);"></i>
+      {% if config %}{{ config.nombre|upper }}{% else %}BARBERSHOP{% endif %}
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-label="Toggle navigation">
+      <i class="bi bi-list fs-4"></i>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav mx-auto gap-1">
+        <li class="nav-item">
+          <a class="nav-link {% if page == 'home' %}active{% endif %}" href="{% url 'home' %}">
+            Inicio
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if page == 'servicios' %}active{% endif %}" href="{% url 'servicios' %}">
+            Servicios
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if page == 'barberos' %}active{% endif %}" href="{% url 'barberos' %}">
+            Barberos
+          </a>
+        </li>
+      </ul>
+      <div class="d-flex align-items-center gap-2">
+        {% if user.is_authenticated %}
+          <a href="{% url 'panel_dashboard' %}" class="btn-panel-secondary" style="text-decoration:none; padding: 0.5rem 1rem; border-radius: 8px;">
+            <i class="bi bi-grid-3x3-gap"></i> Panel
+          </a>
+        {% endif %}
+        <a href="{% url 'reservar' %}" class="btn-reservar-nav nav-link">
+          <i class="bi bi-calendar-check"></i> Reservar cita
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MESSAGES -->
+{% if messages %}
+<div class="container mt-3">
+  {% for message in messages %}
+    <div class="alert-barber {% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}">
+      <i class="bi bi-{% if message.tags == 'error' %}exclamation-circle{% elif message.tags == 'success' %}check-circle{% else %}info-circle{% endif %}"></i>
+      {{ message }}
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- PAGE CONTENT -->
+{% block content %}{% endblock %}
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="footer-brand">
+          <i class="bi bi-scissors" style="color: var(--purple-400);"></i>
+          {% if config %}{{ config.nombre|upper }}{% else %}BARBERSHOP{% endif %}
+        </div>
+        <p class="footer-desc">
+          {% if config and config.descripcion %}
+            {{ config.descripcion }}
+          {% else %}
+            Estilo y precisión en cada corte. Tu mejor versión comienza aquí.
+          {% endif %}
+        </p>
+        {% if config %}
+        <div class="social-links mt-3">
+          {% if config.instagram %}
+          <a href="https://instagram.com/{{ config.instagram }}" target="_blank" class="social-link" aria-label="Instagram">
+            <i class="bi bi-instagram"></i>
+          </a>
+          {% endif %}
+          {% if config.facebook %}
+          <a href="https://facebook.com/{{ config.facebook }}" target="_blank" class="social-link" aria-label="Facebook">
+            <i class="bi bi-facebook"></i>
+          </a>
+          {% endif %}
+          {% if config.whatsapp %}
+          <a href="https://wa.me/{{ config.whatsapp }}" target="_blank" class="social-link" aria-label="WhatsApp">
+            <i class="bi bi-whatsapp"></i>
+          </a>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="col-lg-2 col-md-4">
+        <p class="footer-title">Navegación</p>
+        <a href="{% url 'home' %}" class="footer-link">Inicio</a>
+        <a href="{% url 'servicios' %}" class="footer-link">Servicios</a>
+        <a href="{% url 'barberos' %}" class="footer-link">Barberos</a>
+        <a href="{% url 'reservar' %}" class="footer-link">Reservar cita</a>
+      </div>
+
+      <div class="col-lg-3 col-md-4">
+        <p class="footer-title">Contacto</p>
+        {% if config %}
+          {% if config.direccion %}
+          <p class="footer-link">
+            <i class="bi bi-geo-alt text-purple me-2"></i>{{ config.direccion }}
+          </p>
+          {% endif %}
+          {% if config.telefono %}
+          <a href="tel:{{ config.telefono }}" class="footer-link">
+            <i class="bi bi-telephone text-purple me-2"></i>{{ config.telefono }}
+          </a>
+          {% endif %}
+          {% if config.whatsapp %}
+          <a href="https://wa.me/{{ config.whatsapp }}" class="footer-link" target="_blank">
+            <i class="bi bi-whatsapp text-purple me-2"></i>WhatsApp
+          </a>
+          {% endif %}
+          {% if config.email %}
+          <a href="mailto:{{ config.email }}" class="footer-link">
+            <i class="bi bi-envelope text-purple me-2"></i>{{ config.email }}
+          </a>
+          {% endif %}
+        {% endif %}
+      </div>
+
+      <div class="col-lg-3 col-md-4">
+        <p class="footer-title">Horario</p>
+        {% if config and config.horario_texto %}
+          <p class="footer-desc" style="white-space: pre-line;">{{ config.horario_texto }}</p>
+        {% else %}
+          <p class="footer-link">Lunes – Viernes: 9am – 8pm</p>
+          <p class="footer-link">Sábados: 8am – 7pm</p>
+          <p class="footer-link">Domingos: 10am – 4pm</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p class="footer-copy">
+        &copy; {% now "Y" %} {% if config %}{{ config.nombre }}{% else %}BarberShop{% endif %}. Todos los derechos reservados.
+      </p>
+      <a href="{% url 'panel_login' %}" class="footer-copy" style="opacity:0.4;">
+        Panel Admin
+      </a>
+    </div>
+  </div>
+</footer>
+
+{% block extra_js %}{% endblock %}
+{% endblock %}

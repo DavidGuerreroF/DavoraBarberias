@@ -1,0 +1,225 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block title %}{% if config %}{{ config.nombre }}{% else %}BarberShop{% endif %} — Reserva tu cita{% endblock %}
+
+{% block content %}
+
+<!-- ═══ HERO ═══════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="container hero-content">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <div class="hero-eyebrow">
+          <span></span>
+          Barbería Profesional
+          <span></span>
+        </div>
+
+        <h1 class="hero-title fade-up">
+          {% if config and config.nombre %}
+            {{ config.nombre|upper }}
+          {% else %}
+            ESTILO<br><span class="accent">PRECISION</span><br>ARTE
+          {% endif %}
+        </h1>
+
+        {% if config and config.slogan %}
+        <p class="hero-subtitle fade-up delay-1">{{ config.slogan }}</p>
+        {% else %}
+        <p class="hero-subtitle fade-up delay-1">
+          Donde cada corte cuenta una historia. Tu estilo, nuestra pasión.
+          Reserva tu cita en segundos — sin crear cuenta.
+        </p>
+        {% endif %}
+
+        <div class="d-flex gap-3 flex-wrap fade-up delay-2">
+          <a href="{% url 'reservar' %}" class="btn-primary-barber">
+            <i class="bi bi-calendar-check"></i>
+            Reservar ahora
+          </a>
+          <a href="{% url 'servicios' %}" class="btn-outline-barber">
+            Ver servicios
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+
+        <div class="hero-stats fade-up delay-3">
+          <div class="hero-stat">
+            <div class="hero-stat-number">{{ barberos.count }}+</div>
+            <div class="hero-stat-label">Barberos</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-number">{{ servicios.count }}+</div>
+            <div class="hero-stat-label">Servicios</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-number">100%</div>
+            <div class="hero-stat-label">Satisfacción</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-indicator">Scroll</div>
+</section>
+
+<!-- ═══ CÓMO FUNCIONA ════════════════════════════════════════ -->
+<section class="py-section section-darker">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">Simple y rápido</span>
+      <h2 class="section-title">Cómo reservar tu cita</h2>
+      <p class="section-subtitle">Sin registro, sin complicaciones. Tu cita en 3 pasos.</p>
+      <div class="section-divider"></div>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-4 text-center fade-up delay-1">
+        <div class="servicio-card" style="text-align:center;">
+          <div class="servicio-icon mx-auto" style="font-size:2rem;">
+            <i class="bi bi-hand-index-thumb" style="color: var(--purple-300);"></i>
+          </div>
+          <div style="font-family: var(--font-heading); font-size:3rem; color: rgba(169,41,255,0.15); position:absolute; top:1rem; right:1.5rem; line-height:1;">01</div>
+          <h3 class="servicio-nombre">Elige tu servicio</h3>
+          <p class="servicio-desc">Selecciona el corte o servicio que deseas. Conoce precio y duración.</p>
+        </div>
+      </div>
+      <div class="col-md-4 text-center fade-up delay-2">
+        <div class="servicio-card" style="text-align:center; position:relative;">
+          <div class="servicio-icon mx-auto" style="font-size:2rem;">
+            <i class="bi bi-calendar3" style="color: var(--purple-300);"></i>
+          </div>
+          <div style="font-family: var(--font-heading); font-size:3rem; color: rgba(169,41,255,0.15); position:absolute; top:1rem; right:1.5rem; line-height:1;">02</div>
+          <h3 class="servicio-nombre">Escoge fecha y hora</h3>
+          <p class="servicio-desc">Elige tu barbero favorito, la fecha y el horario que mejor te convenga.</p>
+        </div>
+      </div>
+      <div class="col-md-4 text-center fade-up delay-3">
+        <div class="servicio-card" style="text-align:center; position:relative;">
+          <div class="servicio-icon mx-auto" style="font-size:2rem;">
+            <i class="bi bi-whatsapp" style="color: #25d366;"></i>
+          </div>
+          <div style="font-family: var(--font-heading); font-size:3rem; color: rgba(169,41,255,0.15); position:absolute; top:1rem; right:1.5rem; line-height:1;">03</div>
+          <h3 class="servicio-nombre">Confirma por WhatsApp</h3>
+          <p class="servicio-desc">Tu solicitud se envía directo a nuestro WhatsApp. Te confirmamos al instante.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SERVICIOS DESTACADOS ════════════════════════════════ -->
+{% if servicios %}
+<section class="py-section section-dark">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">Lo que ofrecemos</span>
+      <h2 class="section-title">Nuestros Servicios</h2>
+      <div class="section-divider"></div>
+    </div>
+
+    <div class="row g-4">
+      {% for servicio in servicios %}
+      <div class="col-md-6 col-lg-4 fade-up delay-{{ forloop.counter }}">
+        <div class="servicio-card h-100">
+          <div class="servicio-icon">
+            <i class="bi bi-scissors" style="color: var(--purple-300);"></i>
+          </div>
+          <div class="servicio-nombre">{{ servicio.nombre }}</div>
+          <div class="servicio-precio">${{ servicio.precio }}</div>
+          <div class="servicio-duracion"><i class="bi bi-clock me-1"></i>{{ servicio.duracion_minutos }} min</div>
+          {% if servicio.descripcion %}
+          <p class="servicio-desc">{{ servicio.descripcion|truncatewords:20 }}</p>
+          {% endif %}
+          <a href="{% url 'reservar' %}?servicio={{ servicio.pk }}" class="btn-primary-barber" style="width:100%; justify-content:center; margin-top:auto;">
+            <i class="bi bi-calendar-plus"></i> Reservar
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-5">
+      <a href="{% url 'servicios' %}" class="btn-outline-barber">
+        Ver todos los servicios <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ═══ BARBEROS ════════════════════════════════════════════ -->
+{% if barberos %}
+<section class="py-section section-darker">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">Nuestro equipo</span>
+      <h2 class="section-title">Los Maestros del Estilo</h2>
+      <p class="section-subtitle">Profesionales apasionados listos para darte el mejor corte.</p>
+      <div class="section-divider"></div>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+      {% for barbero in barberos %}
+      <div class="col-md-6 col-lg-4 fade-up delay-{{ forloop.counter }}">
+        <div class="barbero-card">
+          <div class="barbero-foto-wrapper">
+            {% if barbero.foto %}
+              <img src="{{ barbero.foto.url }}" alt="{{ barbero.nombre_completo }}" loading="lazy">
+            {% else %}
+              <div class="barbero-foto-placeholder">
+                <i class="bi bi-person-circle"></i>
+              </div>
+            {% endif %}
+            <div class="barbero-overlay"></div>
+          </div>
+          <div class="barbero-info">
+            <div class="barbero-nombre">{{ barbero.nombre_completo|upper }}</div>
+            {% if barbero.especialidades %}
+            <div class="mt-2">
+              {% for esp in barbero.get_especialidades_lista %}
+                <span class="barbero-badge">{{ esp }}</span>
+              {% endfor %}
+            </div>
+            {% endif %}
+            <div class="mt-3">
+              <a href="{% url 'reservar' %}?barbero={{ barbero.pk }}" class="btn-primary-barber" style="width:100%; justify-content:center;">
+                <i class="bi bi-calendar-check"></i> Reservar con {{ barbero.nombre }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ═══ CTA ══════════════════════════════════════════════════ -->
+<section class="py-section section-dark">
+  <div class="container">
+    <div class="text-center" style="max-width: 700px; margin: 0 auto;">
+      <span class="section-eyebrow">Sin demoras</span>
+      <h2 class="section-title">¿Listo para tu próximo corte?</h2>
+      <p class="section-subtitle mb-4">
+        Reserva en segundos, sin crear cuenta. Solo ingresa tu nombre y WhatsApp.
+      </p>
+      <div class="d-flex gap-3 justify-content-center flex-wrap">
+        <a href="{% url 'reservar' %}" class="btn-primary-barber">
+          <i class="bi bi-calendar-check"></i>
+          Reservar mi cita ahora
+        </a>
+        {% if config and config.whatsapp %}
+        <a href="https://wa.me/{{ config.whatsapp }}" target="_blank" class="btn-whatsapp">
+          <i class="bi bi-whatsapp"></i>
+          Escribir por WhatsApp
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

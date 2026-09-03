@@ -1,0 +1,132 @@
+{% extends 'base_panel.html' %}
+
+{% block page_title %}{{ titulo }}{% endblock %}
+{% block page_header %}{{ titulo }}{% endblock %}
+{% block breadcrumb_extra %} / <a href="{% url 'panel_citas' %}" style="color: var(--gray-600); text-decoration:none;">Citas</a> / <span>{{ titulo }}</span>{% endblock %}
+
+{% block panel_content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="form-card">
+
+      {% if cita %}
+      <!-- Info de la cita actual -->
+      <div style="background: rgba(136,0,230,0.08); border: 1px solid rgba(169,41,255,0.15); border-radius: var(--radius-sm); padding: 1rem 1.25rem; margin-bottom:1.5rem; display:flex; gap:1rem; align-items:center; flex-wrap:wrap;">
+        <div>
+          <div style="font-size:0.75rem; color: var(--gray-600); text-transform:uppercase; letter-spacing:0.5px;">Cita #{{ cita.pk }}</div>
+          <div style="font-weight:600; color:#fff;">{{ cita.nombre_cliente }}</div>
+        </div>
+        <span class="badge-estado {{ cita.estado }}">{{ cita.get_estado_display }}</span>
+        {% if cita.whatsapp_cliente %}
+        <a href="https://wa.me/{{ cita.whatsapp_cliente }}" target="_blank" class="btn-whatsapp" style="padding:0.4rem 1rem; font-size:0.82rem; margin-left:auto;">
+          <i class="bi bi-whatsapp"></i> WhatsApp
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="alert-barber error mb-3">
+          <i class="bi bi-exclamation-circle"></i>
+          {% for e in form.non_field_errors %}{{ e }}{% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Cliente -->
+        <h6 style="font-family: var(--font-heading); letter-spacing:1px; color: var(--purple-300); font-size:1rem; margin-bottom:1rem; padding-bottom:0.5rem; border-bottom: 1px solid rgba(169,41,255,0.15);">
+          <i class="bi bi-person me-2"></i>Datos del cliente
+        </h6>
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label class="form-label-barber">Nombre del cliente</label>
+            {{ form.nombre_cliente }}
+            {% if form.nombre_cliente.errors %}<div style="color:var(--danger);font-size:0.8rem;">{{ form.nombre_cliente.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label-barber">WhatsApp</label>
+            {{ form.whatsapp_cliente }}
+            {% if form.whatsapp_cliente.errors %}<div style="color:var(--danger);font-size:0.8rem;">{{ form.whatsapp_cliente.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        <!-- Servicio & Barbero -->
+        <h6 style="font-family: var(--font-heading); letter-spacing:1px; color: var(--purple-300); font-size:1rem; margin-bottom:1rem; padding-bottom:0.5rem; border-bottom: 1px solid rgba(169,41,255,0.15);">
+          <i class="bi bi-scissors me-2"></i>Servicio y barbero
+        </h6>
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label class="form-label-barber">Servicio</label>
+            {{ form.servicio }}
+            {% if form.servicio.errors %}<div style="color:var(--danger);font-size:0.8rem;">{{ form.servicio.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label-barber">Barbero</label>
+            {{ form.barbero }}
+            {% if form.barbero.errors %}<div style="color:var(--danger);font-size:0.8rem;">{{ form.barbero.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        <!-- Fecha, Hora, Estado -->
+        <h6 style="font-family: var(--font-heading); letter-spacing:1px; color: var(--purple-300); font-size:1rem; margin-bottom:1rem; padding-bottom:0.5rem; border-bottom: 1px solid rgba(169,41,255,0.15);">
+          <i class="bi bi-calendar3 me-2"></i>Fecha, hora y estado
+        </h6>
+        <div class="row g-3 mb-4">
+          <div class="col-md-4">
+            <label class="form-label-barber">Fecha</label>
+            {{ form.fecha }}
+            {% if form.fecha.errors %}<div style="color:var(--danger);font-size:0.8rem;">{{ form.fecha.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label-barber">Hora</label>
+            {{ form.hora }}
+            {% if form.hora.errors %}<div style="color:var(--danger);font-size:0.8rem;">{{ form.hora.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label-barber">Estado</label>
+            {{ form.estado }}
+            {% if form.estado.errors %}<div style="color:var(--danger);font-size:0.8rem;">{{ form.estado.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        <!-- Notas -->
+        <h6 style="font-family: var(--font-heading); letter-spacing:1px; color: var(--purple-300); font-size:1rem; margin-bottom:1rem; padding-bottom:0.5rem; border-bottom: 1px solid rgba(169,41,255,0.15);">
+          <i class="bi bi-chat-text me-2"></i>Notas
+        </h6>
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label class="form-label-barber">Notas del cliente</label>
+            {{ form.notas }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label-barber">Notas internas</label>
+            {{ form.notas_admin }}
+          </div>
+        </div>
+
+        <!-- BUTTONS -->
+        <div class="d-flex gap-3">
+          <button type="submit" class="btn-panel-primary" style="padding:0.75rem 2rem;">
+            <i class="bi bi-check-lg"></i>
+            {% if cita %}Actualizar cita{% else %}Crear cita{% endif %}
+          </button>
+          <a href="{% url 'panel_citas' %}" class="btn-panel-secondary" style="padding:0.75rem 2rem;">
+            <i class="bi bi-arrow-left"></i> Cancelar
+          </a>
+          {% if cita %}
+          <form method="post" action="{% url 'panel_cita_eliminar' cita.pk %}" class="ms-auto"
+                onsubmit="return confirm('¿Eliminar esta cita definitivamente?')">
+            {% csrf_token %}
+            <button type="submit" class="btn-panel-danger" style="padding:0.75rem 1.25rem;">
+              <i class="bi bi-trash3"></i> Eliminar
+            </button>
+          </form>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

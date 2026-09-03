@@ -1,0 +1,284 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block title %}Reservar Cita — {% if config %}{{ config.nombre }}{% else %}BarberShop{% endif %}{% endblock %}
+
+{% block content %}
+
+<!-- PAGE HEADER -->
+<section style="background: linear-gradient(135deg, var(--black-700) 0%, var(--purple-900) 100%); padding: 4rem 0 2.5rem; border-bottom: 1px solid rgba(169,41,255,0.1);">
+  <div class="container text-center">
+    <span class="section-eyebrow">Sin registro requerido</span>
+    <h1 class="section-title">Reserva tu Cita</h1>
+    <p class="section-subtitle">Completa el formulario y te contactamos por WhatsApp para confirmar.</p>
+    <div class="section-divider"></div>
+  </div>
+</section>
+
+<section class="py-section-sm section-dark">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-xl-7">
+
+        <!-- STEP INDICATOR -->
+        <div class="step-indicator mb-4">
+          <div class="step active">
+            <div class="step-number"><i class="bi bi-person"></i></div>
+            <div class="step-label">Tus datos</div>
+          </div>
+          <div class="step-line"></div>
+          <div class="step active">
+            <div class="step-number"><i class="bi bi-scissors"></i></div>
+            <div class="step-label">Servicio</div>
+          </div>
+          <div class="step-line"></div>
+          <div class="step active">
+            <div class="step-number"><i class="bi bi-calendar3"></i></div>
+            <div class="step-label">Fecha y hora</div>
+          </div>
+          <div class="step-line"></div>
+          <div class="step">
+            <div class="step-number"><i class="bi bi-whatsapp"></i></div>
+            <div class="step-label">Confirmar</div>
+          </div>
+        </div>
+
+        <!-- FORM CARD -->
+        <div class="form-card">
+          <form method="post" id="reservaForm" novalidate>
+            {% csrf_token %}
+
+            <!-- Non-field errors -->
+            {% if form.non_field_errors %}
+            <div class="alert-barber error mb-3">
+              <i class="bi bi-exclamation-circle"></i>
+              {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- ── SECCIÓN 1: Datos personales ── -->
+            <div class="mb-4">
+              <h5 style="font-family: var(--font-heading); font-size:1.2rem; color: var(--purple-300); letter-spacing:1px; margin-bottom:1.25rem; padding-bottom:0.75rem; border-bottom: 1px solid rgba(169,41,255,0.15);">
+                <i class="bi bi-person me-2"></i>Tus datos
+              </h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label-barber" for="{{ form.nombre.id_for_label }}">Nombre</label>
+                  {{ form.nombre }}
+                  {% if form.nombre.errors %}
+                  <div style="color: var(--danger); font-size:0.8rem; margin-top:4px;">
+                    {% for e in form.nombre.errors %}{{ e }}{% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label-barber" for="{{ form.whatsapp.id_for_label }}">
+                    <i class="bi bi-whatsapp me-1" style="color: #25d366;"></i>WhatsApp
+                  </label>
+                  {{ form.whatsapp }}
+                  {% if form.whatsapp.errors %}
+                  <div style="color: var(--danger); font-size:0.8rem; margin-top:4px;">
+                    {% for e in form.whatsapp.errors %}{{ e }}{% endfor %}
+                  </div>
+                  {% endif %}
+                  <div style="font-size:0.75rem; color: var(--gray-600); margin-top:4px;">
+                    Te enviaremos la confirmación aquí
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── SECCIÓN 2: Servicio y barbero ── -->
+            <div class="mb-4">
+              <h5 style="font-family: var(--font-heading); font-size:1.2rem; color: var(--purple-300); letter-spacing:1px; margin-bottom:1.25rem; padding-bottom:0.75rem; border-bottom: 1px solid rgba(169,41,255,0.15);">
+                <i class="bi bi-scissors me-2"></i>Servicio y barbero
+              </h5>
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label-barber" for="{{ form.servicio.id_for_label }}">Servicio</label>
+                  {{ form.servicio }}
+                  {% if form.servicio.errors %}
+                  <div style="color: var(--danger); font-size:0.8rem; margin-top:4px;">
+                    {% for e in form.servicio.errors %}{{ e }}{% endfor %}
+                  </div>
+                  {% endif %}
+                  <!-- Info del servicio seleccionado -->
+                  <div id="servicioInfo" style="display:none; margin-top:8px; padding:10px 14px; background: rgba(136,0,230,0.1); border-radius: var(--radius-sm); border: 1px solid rgba(169,41,255,0.2);">
+                    <span id="servicioPrecio" style="color: var(--purple-300); font-weight:700;"></span>
+                    <span style="color: var(--gray-600); margin: 0 8px;">·</span>
+                    <span id="servicioDuracion" style="color: var(--gray-500); font-size:0.85rem;"></span>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label-barber" for="{{ form.barbero.id_for_label }}">
+                    Barbero <span style="color: var(--gray-600); font-weight:400; text-transform:none;">(opcional)</span>
+                  </label>
+                  {{ form.barbero }}
+                  {% if form.barbero.errors %}
+                  <div style="color: var(--danger); font-size:0.8rem; margin-top:4px;">
+                    {% for e in form.barbero.errors %}{{ e }}{% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- ── SECCIÓN 3: Fecha y hora ── -->
+            <div class="mb-4">
+              <h5 style="font-family: var(--font-heading); font-size:1.2rem; color: var(--purple-300); letter-spacing:1px; margin-bottom:1.25rem; padding-bottom:0.75rem; border-bottom: 1px solid rgba(169,41,255,0.15);">
+                <i class="bi bi-calendar3 me-2"></i>Fecha y hora
+              </h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label-barber" for="{{ form.fecha.id_for_label }}">Fecha</label>
+                  {{ form.fecha }}
+                  {% if form.fecha.errors %}
+                  <div style="color: var(--danger); font-size:0.8rem; margin-top:4px;">
+                    {% for e in form.fecha.errors %}{{ e }}{% endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label-barber" for="{{ form.hora.id_for_label }}">Hora</label>
+                  {{ form.hora }}
+                  {% if form.hora.errors %}
+                  <div style="color: var(--danger); font-size:0.8rem; margin-top:4px;">
+                    {% for e in form.hora.errors %}{{ e }}{% endfor %}
+                  </div>
+                  {% endif %}
+                  <!-- Horas disponibles -->
+                  <div id="horasDisponibles" style="display:none; margin-top:8px;">
+                    <div style="font-size:0.75rem; color: var(--gray-600); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">
+                      Horarios disponibles:
+                    </div>
+                    <div id="horasBtns" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── SECCIÓN 4: Notas ── -->
+            <div class="mb-4">
+              <label class="form-label-barber" for="{{ form.notas.id_for_label }}">
+                Notas adicionales <span style="color: var(--gray-600); font-weight:400; text-transform:none;">(opcional)</span>
+              </label>
+              {{ form.notas }}
+            </div>
+
+            <!-- AVISO WhatsApp -->
+            <div class="alert-barber info mb-4">
+              <i class="bi bi-whatsapp" style="color: #25d366;"></i>
+              <span>Al enviar, se abrirá WhatsApp con tu solicitud lista para enviarnos. ¡Es gratis y sin registro!</span>
+            </div>
+
+            <!-- SUBMIT -->
+            <button type="submit" class="btn-primary-barber" style="width:100%; justify-content:center; font-size:1rem; padding: 1rem;">
+              <i class="bi bi-send"></i>
+              Enviar solicitud de cita
+            </button>
+          </form>
+        </div>
+
+        <!-- INFO CARDS -->
+        <div class="row g-3 mt-3">
+          <div class="col-4 text-center">
+            <div style="padding:1rem; background: var(--black-600); border-radius: var(--radius-sm); border: 1px solid rgba(169,41,255,0.1);">
+              <i class="bi bi-shield-check" style="color: var(--purple-300); font-size:1.25rem;"></i>
+              <div style="font-size:0.75rem; color: var(--gray-600); margin-top:4px;">Sin registro</div>
+            </div>
+          </div>
+          <div class="col-4 text-center">
+            <div style="padding:1rem; background: var(--black-600); border-radius: var(--radius-sm); border: 1px solid rgba(169,41,255,0.1);">
+              <i class="bi bi-lightning-charge" style="color: var(--purple-300); font-size:1.25rem;"></i>
+              <div style="font-size:0.75rem; color: var(--gray-600); margin-top:4px;">Confirmación rápida</div>
+            </div>
+          </div>
+          <div class="col-4 text-center">
+            <div style="padding:1rem; background: var(--black-600); border-radius: var(--radius-sm); border: 1px solid rgba(169,41,255,0.1);">
+              <i class="bi bi-whatsapp" style="color: #25d366; font-size:1.25rem;"></i>
+              <div style="font-size:0.75rem; color: var(--gray-600); margin-top:4px;">Por WhatsApp</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Datos de servicios para mostrar info al seleccionar
+const serviciosData = {
+  {% for s in servicios %}
+  "{{ s.pk }}": { precio: "${{ s.precio }}", duracion: "{{ s.duracion_minutos }} minutos" },
+  {% endfor %}
+};
+
+document.getElementById('id_servicio').addEventListener('change', function() {
+  const val = this.value;
+  const info = serviciosData[val];
+  const box = document.getElementById('servicioInfo');
+  if (info) {
+    document.getElementById('servicioPrecio').textContent = info.precio;
+    document.getElementById('servicioDuracion').textContent = '⏱ ' + info.duracion;
+    box.style.display = 'block';
+  } else {
+    box.style.display = 'none';
+  }
+});
+
+// Cargar horas disponibles cuando cambia barbero o fecha
+function cargarHoras() {
+  const barberoId = document.getElementById('id_barbero').value;
+  const fecha = document.getElementById('id_fecha').value;
+  const container = document.getElementById('horasDisponibles');
+  const btns = document.getElementById('horasBtns');
+
+  if (!barberoId || !fecha) { container.style.display = 'none'; return; }
+
+  fetch(`/citas/api/horas/?barbero_id=${barberoId}&fecha=${fecha}`)
+    .then(r => r.json())
+    .then(data => {
+      btns.innerHTML = '';
+      if (data.horas && data.horas.length > 0) {
+        data.horas.forEach(h => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.textContent = h;
+          btn.style.cssText = 'padding:4px 12px; border-radius:20px; font-size:0.8rem; font-weight:600; cursor:pointer; border: 1px solid rgba(169,41,255,0.3); background: rgba(136,0,230,0.1); color: var(--purple-200); transition: all 0.2s;';
+          btn.addEventListener('click', () => {
+            document.getElementById('id_hora').value = h;
+            btns.querySelectorAll('button').forEach(b => {
+              b.style.background = 'rgba(136,0,230,0.1)';
+              b.style.borderColor = 'rgba(169,41,255,0.3)';
+              b.style.color = 'var(--purple-200)';
+            });
+            btn.style.background = 'rgba(136,0,230,0.4)';
+            btn.style.borderColor = 'rgba(169,41,255,0.8)';
+            btn.style.color = '#fff';
+          });
+          btns.appendChild(btn);
+        });
+        container.style.display = 'block';
+      } else {
+        container.style.display = 'none';
+      }
+    })
+    .catch(() => { container.style.display = 'none'; });
+}
+
+document.getElementById('id_barbero').addEventListener('change', cargarHoras);
+document.getElementById('id_fecha').addEventListener('change', cargarHoras);
+
+// Set min date to today
+const hoy = new Date().toISOString().split('T')[0];
+document.getElementById('id_fecha').min = hoy;
+
+// Trigger servicio info on load if pre-selected
+const servicioSelect = document.getElementById('id_servicio');
+if (servicioSelect.value) servicioSelect.dispatchEvent(new Event('change'));
+</script>
+{% endblock %}

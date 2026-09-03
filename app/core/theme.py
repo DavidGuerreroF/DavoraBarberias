@@ -10,8 +10,8 @@ BG_INPUT     = "#45475a"   # entradas de texto
 BG_TABLE     = "#1e1e2e"   # treeview fondo
 BG_TABLE_ALT = "#2a2a3e"   # fila alternada
 
-ACCENT       = "#89b4fa"   # azul primario (botones, selección)
-ACCENT_HOVER = "#74c7ec"   # hover azul
+ACCENT       = "#cba6f7"   # morado primario (botones, selección)
+ACCENT_HOVER = "#b4a0f5"   # hover morado
 SUCCESS      = "#a6e3a1"   # verde
 WARNING      = "#f9e2af"   # amarillo
 DANGER       = "#f38ba8"   # rojo

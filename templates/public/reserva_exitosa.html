@@ -1,0 +1,81 @@
+{% extends 'base_public.html' %}
+
+{% block title %}¡Cita Registrada! — {% if config %}{{ config.nombre }}{% else %}BarberShop{% endif %}{% endblock %}
+
+{% block content %}
+<section class="py-section section-dark">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-6 col-md-8">
+        <div class="form-card text-center">
+
+          <!-- Icono éxito -->
+          <div class="success-icon">
+            <i class="bi bi-check-lg" style="color: var(--success);"></i>
+          </div>
+
+          <h2 style="font-family: var(--font-heading); font-size:2rem; color:#fff; letter-spacing:1px; margin-bottom:0.5rem;">
+            ¡Solicitud enviada!
+          </h2>
+          <p style="color: var(--gray-500); margin-bottom:2rem;">
+            Tu cita ha sido registrada. Ahora envíanos el mensaje por WhatsApp para confirmarla.
+          </p>
+
+          <!-- Detalle de la cita -->
+          <div style="background: var(--black-500); border-radius: var(--radius-sm); padding: 1.25rem; margin-bottom:2rem; text-align:left;">
+            <div class="cita-detail-row">
+              <span class="cita-detail-label"><i class="bi bi-person me-2"></i>Nombre</span>
+              <span class="cita-detail-value">{{ cita.nombre_cliente }}</span>
+            </div>
+            <div class="cita-detail-row">
+              <span class="cita-detail-label"><i class="bi bi-scissors me-2"></i>Servicio</span>
+              <span class="cita-detail-value">{{ cita.servicio.nombre }}</span>
+            </div>
+            {% if cita.barbero %}
+            <div class="cita-detail-row">
+              <span class="cita-detail-label"><i class="bi bi-person-badge me-2"></i>Barbero</span>
+              <span class="cita-detail-value">{{ cita.barbero.nombre_completo }}</span>
+            </div>
+            {% endif %}
+            <div class="cita-detail-row">
+              <span class="cita-detail-label"><i class="bi bi-calendar3 me-2"></i>Fecha</span>
+              <span class="cita-detail-value">{{ cita.fecha|date:"d/m/Y" }}</span>
+            </div>
+            <div class="cita-detail-row">
+              <span class="cita-detail-label"><i class="bi bi-clock me-2"></i>Hora</span>
+              <span class="cita-detail-value">{{ cita.hora|time:"H:i" }}</span>
+            </div>
+            <div class="cita-detail-row" style="border-bottom:none;">
+              <span class="cita-detail-label">Estado</span>
+              <span class="badge-estado pendiente">
+                <i class="bi bi-hourglass-split"></i> Pendiente de confirmación
+              </span>
+            </div>
+          </div>
+
+          <!-- Botón WhatsApp principal -->
+          <a href="{{ whatsapp_url }}" target="_blank" class="btn-whatsapp" style="width:100%; justify-content:center; font-size:1.05rem; padding:1rem; margin-bottom:1rem;">
+            <i class="bi bi-whatsapp fs-5"></i>
+            Enviar por WhatsApp para confirmar
+          </a>
+
+          <p style="font-size:0.8rem; color: var(--gray-600); margin-bottom:1.5rem;">
+            Se abrirá WhatsApp con el mensaje listo. Solo toca "Enviar".
+          </p>
+
+          <hr class="divider-purple">
+
+          <div class="d-flex gap-3 justify-content-center flex-wrap mt-3">
+            <a href="{% url 'reservar' %}" class="btn-outline-barber" style="font-size:0.85rem; padding:0.6rem 1.5rem;">
+              <i class="bi bi-plus-lg"></i> Nueva cita
+            </a>
+            <a href="{% url 'home' %}" class="btn-panel-secondary" style="font-size:0.85rem;">
+              <i class="bi bi-house"></i> Volver al inicio
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

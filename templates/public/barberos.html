@@ -1,0 +1,75 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Barberos — {% if config %}{{ config.nombre }}{% else %}BarberShop{% endif %}{% endblock %}
+
+{% block content %}
+
+<!-- PAGE HEADER -->
+<section style="background: linear-gradient(135deg, var(--black-700) 0%, var(--purple-900) 100%); padding: 5rem 0 3rem; border-bottom: 1px solid rgba(169,41,255,0.1);">
+  <div class="container text-center">
+    <span class="section-eyebrow">Nuestro equipo</span>
+    <h1 class="section-title">Los Maestros del Estilo</h1>
+    <p class="section-subtitle">Profesionales con años de experiencia, listos para transformar tu look.</p>
+    <div class="section-divider"></div>
+  </div>
+</section>
+
+<!-- BARBEROS GRID -->
+<section class="py-section section-dark">
+  <div class="container">
+    {% if barberos %}
+    <div class="row g-5 justify-content-center">
+      {% for barbero in barberos %}
+      <div class="col-md-6 col-lg-4 fade-up delay-{{ forloop.counter }}">
+        <div class="barbero-card">
+          <div class="barbero-foto-wrapper">
+            {% if barbero.foto %}
+              <img src="{{ barbero.foto.url }}" alt="{{ barbero.nombre_completo }}" loading="lazy">
+            {% else %}
+              <div class="barbero-foto-placeholder">
+                <i class="bi bi-person-circle"></i>
+              </div>
+            {% endif %}
+            <div class="barbero-overlay"></div>
+          </div>
+
+          <div class="barbero-info">
+            <div class="barbero-nombre">{{ barbero.nombre_completo|upper }}</div>
+
+            {% if barbero.especialidades %}
+            <div class="mt-2 mb-3">
+              {% for esp in barbero.get_especialidades_lista %}
+                <span class="barbero-badge">{{ esp }}</span>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+            <hr class="divider-purple">
+
+            <div class="d-flex gap-2 flex-wrap">
+              <a href="{% url 'reservar' %}?barbero={{ barbero.pk }}" class="btn-primary-barber flex-fill" style="justify-content:center;">
+                <i class="bi bi-calendar-check"></i> Reservar
+              </a>
+              {% if barbero.telefono %}
+              <a href="https://wa.me/{{ barbero.telefono }}" target="_blank" class="btn-outline-barber" style="padding: 0.85rem 1rem;">
+                <i class="bi bi-whatsapp"></i>
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon"><i class="bi bi-person-badge"></i></div>
+      <div class="empty-state-title">Equipo en construcción</div>
+      <p class="empty-state-text">Pronto presentaremos a nuestro equipo de barberos.</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

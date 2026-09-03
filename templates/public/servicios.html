@@ -1,0 +1,83 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Servicios — {% if config %}{{ config.nombre }}{% else %}BarberShop{% endif %}{% endblock %}
+
+{% block content %}
+
+<!-- PAGE HEADER -->
+<section style="background: linear-gradient(135deg, var(--black-700) 0%, var(--purple-900) 100%); padding: 5rem 0 3rem; border-bottom: 1px solid rgba(169,41,255,0.1);">
+  <div class="container text-center">
+    <span class="section-eyebrow">Lo que ofrecemos</span>
+    <h1 class="section-title">Nuestros Servicios</h1>
+    <p class="section-subtitle">Calidad y estilo en cada servicio. Precios claros, sin sorpresas.</p>
+    <div class="section-divider"></div>
+  </div>
+</section>
+
+<!-- SERVICIOS GRID -->
+<section class="py-section section-dark">
+  <div class="container">
+    {% if servicios %}
+    <div class="row g-4">
+      {% for servicio in servicios %}
+      <div class="col-md-6 col-lg-4 fade-up delay-{{ forloop.counter }}">
+        <div class="servicio-card h-100" style="display:flex; flex-direction:column;">
+          {% if servicio.imagen %}
+          <div style="height:200px; overflow:hidden; border-radius: var(--radius-sm); margin-bottom:1.25rem;">
+            <img src="{{ servicio.imagen.url }}" alt="{{ servicio.nombre }}"
+                 style="width:100%; height:100%; object-fit:cover; transition: transform 0.4s ease;"
+                 loading="lazy">
+          </div>
+          {% else %}
+          <div class="servicio-icon">
+            <i class="bi bi-scissors" style="color: var(--purple-300);"></i>
+          </div>
+          {% endif %}
+
+          <div class="servicio-nombre">{{ servicio.nombre }}</div>
+
+          <div class="d-flex align-items-center gap-3 my-2">
+            <div class="servicio-precio">${{ servicio.precio }}</div>
+            <div class="servicio-duracion">
+              <i class="bi bi-clock me-1"></i>{{ servicio.duracion_minutos }} min
+            </div>
+          </div>
+
+          {% if servicio.descripcion %}
+          <p class="servicio-desc">{{ servicio.descripcion }}</p>
+          {% endif %}
+
+          <div style="margin-top:auto; padding-top: 1rem;">
+            <a href="{% url 'reservar' %}?servicio={{ servicio.pk }}" class="btn-primary-barber" style="width:100%; justify-content:center;">
+              <i class="bi bi-calendar-plus"></i> Reservar este servicio
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center mt-5 py-4" style="border-top: 1px solid rgba(169,41,255,0.1);">
+      <p class="section-subtitle mb-3">¿No encuentras lo que buscas? Escríbenos directamente.</p>
+      {% if config and config.whatsapp %}
+      <a href="https://wa.me/{{ config.whatsapp }}" target="_blank" class="btn-whatsapp">
+        <i class="bi bi-whatsapp"></i> Consultar por WhatsApp
+      </a>
+      {% endif %}
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon"><i class="bi bi-scissors"></i></div>
+      <div class="empty-state-title">Próximamente</div>
+      <p class="empty-state-text">Estamos preparando nuestra lista de servicios.</p>
+      <div class="mt-3">
+        <a href="{% url 'reservar' %}" class="btn-primary-barber">Reservar cita</a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

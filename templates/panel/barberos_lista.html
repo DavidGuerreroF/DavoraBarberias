@@ -1,0 +1,110 @@
+{% extends 'base_panel.html' %}
+
+{% block page_title %}Barberos{% endblock %}
+{% block page_header %}Barberos{% endblock %}
+{% block breadcrumb_extra %} / <span>Equipo</span>{% endblock %}
+
+{% block panel_content %}
+
+<div class="table-card">
+  <div class="table-card-header">
+    <div class="table-card-title">
+      <i class="bi bi-person-badge me-2" style="color: var(--purple-300);"></i>
+      Barberos
+      <span style="font-family: var(--font-body); font-size:0.85rem; color: var(--gray-600); font-weight:400; margin-left:8px;">
+        {{ barberos.count }} total
+      </span>
+    </div>
+    <a href="{% url 'panel_barbero_crear' %}" class="btn-panel-primary">
+      <i class="bi bi-plus-lg"></i> Nuevo barbero
+    </a>
+  </div>
+
+  {% if barberos %}
+  <div class="table-responsive-mobile">
+    <table class="table-dark-barber w-100">
+      <thead>
+        <tr>
+          <th>Barbero</th>
+          <th>Especialidades</th>
+          <th>Teléfono</th>
+          <th>Estado</th>
+          <th>Orden</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for barbero in barberos %}
+        <tr>
+          <td>
+            <div class="d-flex align-items-center gap-3">
+              {% if barbero.foto %}
+              <img src="{{ barbero.foto.url }}" alt="{{ barbero.nombre_completo }}"
+                   style="width:44px; height:44px; border-radius:50%; object-fit:cover; border:2px solid rgba(169,41,255,0.3);">
+              {% else %}
+              <div class="avatar-circle">{{ barbero.nombre|first }}</div>
+              {% endif %}
+              <div>
+                <div style="font-weight:600; color:#fff;">{{ barbero.nombre_completo }}</div>
+                <div style="font-size:0.78rem; color: var(--gray-600);">ID #{{ barbero.pk }}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            {% for esp in barbero.get_especialidades_lista %}
+              <span class="barbero-badge">{{ esp }}</span>
+            {% empty %}
+              <span style="color: var(--gray-600);">—</span>
+            {% endfor %}
+          </td>
+          <td>
+            {% if barbero.telefono %}
+            <a href="https://wa.me/{{ barbero.telefono }}" target="_blank" style="color: #25d366; text-decoration:none; font-size:0.9rem;">
+              <i class="bi bi-whatsapp me-1"></i>{{ barbero.telefono }}
+            </a>
+            {% else %}
+            <span style="color: var(--gray-600);">—</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if barbero.activo %}
+            <span class="badge-estado atendida"><i class="bi bi-check-circle me-1"></i>Activo</span>
+            {% else %}
+            <span class="badge-estado cancelada"><i class="bi bi-x-circle me-1"></i>Inactivo</span>
+            {% endif %}
+          </td>
+          <td style="color: var(--gray-500);">{{ barbero.orden }}</td>
+          <td>
+            <div class="d-flex gap-1">
+              <a href="{% url 'panel_barbero_editar' barbero.pk %}" class="btn-panel-edit">
+                <i class="bi bi-pencil"></i> Editar
+              </a>
+              <form method="post" action="{% url 'panel_barbero_eliminar' barbero.pk %}" class="d-inline"
+                    onsubmit="return confirm('¿Eliminar a {{ barbero.nombre_completo }}?')">
+                {% csrf_token %}
+                <button type="submit" class="btn-panel-danger">
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon"><i class="bi bi-person-badge"></i></div>
+    <div class="empty-state-title">Sin barberos registrados</div>
+    <p class="empty-state-text">Agrega los barberos de tu equipo para que los clientes puedan reservar con ellos.</p>
+    <div class="mt-3">
+      <a href="{% url 'panel_barbero_crear' %}" class="btn-panel-primary">
+        <i class="bi bi-plus-lg"></i> Agregar barbero
+      </a>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

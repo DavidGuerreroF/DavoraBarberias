@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% block page_title %}Panel{% endblock %} — {% if config %}{{ config.nombre }}{% else %}BarberShop{% endif %}{% endblock %}
+
+{% block body %}
+<div class="panel-wrapper">
+
+  <!-- SIDEBAR OVERLAY (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">
+        <i class="bi bi-scissors text-white"></i>
+      </div>
+      <div>
+        <div class="sidebar-logo-text">
+          {% if config %}{{ config.nombre|upper|truncatechars:12 }}{% else %}BARBER<span>SHOP</span>{% endif %}
+        </div>
+        <div style="font-size:0.65rem; color: var(--gray-600); letter-spacing:1px; text-transform:uppercase;">Panel Admin</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <p class="sidebar-section-label">Principal</p>
+
+      <a href="{% url 'panel_dashboard' %}" class="sidebar-link {% if page == 'dashboard' %}active{% endif %}">
+        <span class="sidebar-icon"><i class="bi bi-grid-3x3-gap-fill"></i></span>
+        Dashboard
+      </a>
+
+      <a href="{% url 'panel_citas' %}" class="sidebar-link {% if page == 'citas' %}active{% endif %}">
+        <span class="sidebar-icon"><i class="bi bi-calendar3"></i></span>
+        Citas
+        {% if pendientes_count and pendientes_count > 0 %}
+        <span class="sidebar-badge">{{ pendientes_count }}</span>
+        {% endif %}
+      </a>
+
+      <p class="sidebar-section-label">Gestión</p>
+
+      <a href="{% url 'panel_barberos' %}" class="sidebar-link {% if page == 'barberos' %}active{% endif %}">
+        <span class="sidebar-icon"><i class="bi bi-person-badge"></i></span>
+        Barberos
+      </a>
+
+      <a href="{% url 'panel_servicios' %}" class="sidebar-link {% if page == 'servicios' %}active{% endif %}">
+        <span class="sidebar-icon"><i class="bi bi-scissors"></i></span>
+        Servicios
+      </a>
+
+      <a href="{% url 'panel_clientes' %}" class="sidebar-link {% if page == 'clientes' %}active{% endif %}">
+        <span class="sidebar-icon"><i class="bi bi-people"></i></span>
+        Clientes
+      </a>
+
+      <p class="sidebar-section-label">Próximamente</p>
+
+      <a href="#" class="sidebar-link" style="opacity:0.4; cursor:not-allowed;">
+        <span class="sidebar-icon"><i class="bi bi-cash-stack"></i></span>
+        Ventas
+      </a>
+
+      <a href="#" class="sidebar-link" style="opacity:0.4; cursor:not-allowed;">
+        <span class="sidebar-icon"><i class="bi bi-box-seam"></i></span>
+        Inventario
+      </a>
+
+      <a href="#" class="sidebar-link" style="opacity:0.4; cursor:not-allowed;">
+        <span class="sidebar-icon"><i class="bi bi-graph-up"></i></span>
+        Reportes
+      </a>
+
+      <p class="sidebar-section-label">Sistema</p>
+
+      <a href="{% url 'home' %}" class="sidebar-link" target="_blank">
+        <span class="sidebar-icon"><i class="bi bi-box-arrow-up-right"></i></span>
+        Ver sitio web
+      </a>
+
+      <a href="/django-admin/" class="sidebar-link" target="_blank">
+        <span class="sidebar-icon"><i class="bi bi-gear"></i></span>
+        Django Admin
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">{{ request.user.username|first|upper }}</div>
+        <div>
+          <div class="sidebar-username">{{ request.user.username }}</div>
+          <div style="font-size:0.7rem; color: var(--gray-600);">Administrador</div>
+        </div>
+        <a href="{% url 'panel_logout' %}" class="sidebar-logout ms-auto" title="Cerrar sesión">
+          <i class="bi bi-box-arrow-right fs-5"></i>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="panel-content">
+
+    <!-- TOPBAR -->
+    <header class="panel-topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="d-lg-none btn p-1" onclick="toggleSidebar()" style="color: var(--purple-300); background:none; border:none;">
+          <i class="bi bi-list fs-4"></i>
+        </button>
+        <div>
+          <div class="topbar-title">{% block page_header %}Panel{% endblock %}</div>
+          <div class="topbar-breadcrumb">
+            <a href="{% url 'panel_dashboard' %}" style="color: var(--gray-600); text-decoration:none;">Inicio</a>
+            {% block breadcrumb_extra %}{% endblock %}
+          </div>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <a href="{% url 'reservar' %}" target="_blank" class="btn-panel-secondary d-none d-md-flex">
+          <i class="bi bi-calendar-plus"></i> Nueva Reserva
+        </a>
+        <a href="{% url 'panel_cita_crear' %}" class="btn-panel-primary">
+          <i class="bi bi-plus-lg"></i>
+          <span class="d-none d-md-inline">Nueva Cita</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- MESSAGES -->
+    {% if messages %}
+    <div class="px-3 pt-3">
+      {% for message in messages %}
+        <div class="alert-barber {% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}">
+          <i class="bi bi-{% if message.tags == 'error' %}exclamation-circle{% elif message.tags == 'success' %}check-circle{% else %}info-circle{% endif %}"></i>
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- PAGE CONTENT -->
+    <div class="panel-main">
+      {% block panel_content %}{% endblock %}
+    </div>
+
+  </main>
+</div>
+
+<script>
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('open');
+  }
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('open');
+  }
+</script>
+{% block extra_js %}{% endblock %}
+{% endblock %}
